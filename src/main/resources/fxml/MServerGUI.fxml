@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="%menu.title.file">
+          <items>
+            <MenuItem mnemonicParsing="false" text="%menu.title.preferences" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="%menu.title.quit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="%menu.title.help">
+          <items>
+            <MenuItem mnemonicParsing="false" text="%menu.title.about" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+      <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <children>
+            <ListView fx:id="avaiableCrawler" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER" prefHeight="371.0" prefWidth="47.0">
+               <children>
+                  <Button fx:id="removeAllButton" mnemonicParsing="false" onAction="#removeAll" prefHeight="25.0" prefWidth="50.0" text="|&lt;&lt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+                  <Button fx:id="removeSelectedButton" mnemonicParsing="false" onAction="#removeSelected" prefHeight="25.0" prefWidth="50.0" text="&lt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+                  <Button fx:id="addSelectedButton" mnemonicParsing="false" onAction="#addSelected" prefHeight="25.0" prefWidth="50.0" text="&gt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+                  <Button fx:id="addAllButton" mnemonicParsing="false" onAction="#addAll" prefHeight="25.0" prefWidth="50.0" text="&gt;&gt;|" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <ListView fx:id="crawlerToUse" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+  </children>
+  <stylesheets>
+    <URL value="@style/MServer.css" />
+  </stylesheets>
+</VBox>
