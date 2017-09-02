@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.ListSelectionView?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -16,7 +24,7 @@
           <items>
             <MenuItem mnemonicParsing="false" text="%menu.title.preferences" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="%menu.title.quit" />
+            <MenuItem mnemonicParsing="false" onAction="#quit" text="%menu.title.quit" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="%menu.title.help">
@@ -26,22 +34,44 @@
         </Menu>
       </menus>
     </MenuBar>
-      <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-         <children>
-            <ListView fx:id="avaiableCrawler" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <VBox alignment="CENTER" prefHeight="371.0" prefWidth="47.0">
-               <children>
-                  <Button fx:id="removeAllButton" mnemonicParsing="false" onAction="#removeAll" prefHeight="25.0" prefWidth="50.0" text="|&lt;&lt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
-                  <Button fx:id="removeSelectedButton" mnemonicParsing="false" onAction="#removeSelected" prefHeight="25.0" prefWidth="50.0" text="&lt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
-                  <Button fx:id="addSelectedButton" mnemonicParsing="false" onAction="#addSelected" prefHeight="25.0" prefWidth="50.0" text="&gt;" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
-                  <Button fx:id="addAllButton" mnemonicParsing="false" onAction="#addAll" prefHeight="25.0" prefWidth="50.0" text="&gt;&gt;|" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-            <ListView fx:id="crawlerToUse" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-         </children>
-      </HBox>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+          <Tab text="%tabs.crawler">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ListSelectionView fx:id="crawlerSelectionView" styleClass="jfx-list-view,jfx-button" VBox.vgrow="ALWAYS" />
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                          <buttons>
+                            <Button fx:id="startButton" disable="true" mnemonicParsing="false" onAction="#startCrawler" text="%buttonbar.start" />
+                              <Button fx:id="saveButton" disable="true" mnemonicParsing="false" onAction="#openSaveDialog" text="%buttonbar.save" />
+                              <Button fx:id="startImport" mnemonicParsing="false" onAction="#openFileImportDialog" text="%buttonbar.import" />
+                              <Button fx:id="startImportUrl" mnemonicParsing="false" onAction="#openUrlImportDialog" text="%buttonbar.importUrl" />
+                          </buttons>
+                        </ButtonBar>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+          <Tab text="%tabs.details">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                          <items>
+                              <ListView fx:id="messageList" prefHeight="200.0" prefWidth="200.0" />
+                              <PieChart fx:id="statisticChart" title="%titles.chart" />
+                          </items>
+                        </SplitPane>
+                        <ProgressBar fx:id="progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" />
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
   </children>
   <stylesheets>
-    <URL value="@style/MServer.css" />
+    <URL value="@../style/MServerGUI.css" />
   </stylesheets>
 </VBox>
