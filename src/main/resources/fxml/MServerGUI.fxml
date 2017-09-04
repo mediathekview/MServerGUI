@@ -4,6 +4,7 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -13,12 +14,13 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ListSelectionView?>
 
 <VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
   <children>
-    <MenuBar VBox.vgrow="NEVER">
+    <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="%menu.title.file">
           <items>
@@ -59,7 +61,16 @@
                      <children>
                         <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                           <items>
-                              <ListView fx:id="messageList" prefHeight="200.0" prefWidth="200.0" />
+                              <VBox>
+                                 <children>
+                                    <ListView fx:id="messageList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <HBox>
+                                       <children>
+                                          <CheckBox fx:id="debugCheckBox" mnemonicParsing="false" text="%checkbox.debug" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
                               <PieChart fx:id="statisticChart" title="%titles.chart" />
                           </items>
                         </SplitPane>
