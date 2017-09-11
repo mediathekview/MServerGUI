@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
@@ -36,7 +39,7 @@
         </Menu>
       </menus>
     </MenuBar>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+      <TabPane fx:id="mainTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
           <Tab text="%tabs.crawler">
                <content>
@@ -71,7 +74,19 @@
                                     </HBox>
                                  </children>
                               </VBox>
-                              <PieChart fx:id="statisticChart" title="%titles.chart" />
+                              <VBox>
+                                 <children>
+                                    <PieChart fx:id="statisticChart" title="%titles.chart" VBox.vgrow="ALWAYS" />
+                                    <BarChart fx:id="processChart" title="%titles.processChart">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </VBox>
                           </items>
                         </SplitPane>
                         <ProgressBar fx:id="progressBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" progress="0.0" />

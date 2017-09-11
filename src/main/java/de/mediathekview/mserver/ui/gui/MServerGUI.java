@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -34,10 +31,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
@@ -45,7 +42,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.text.Text;
+import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -54,13 +51,13 @@ import javafx.stage.Stage;
 public class MServerGUI extends Application
 {
 
+    private static final int DETAILS_TAB_INDEX = 1;
     private static final Logger LOG = LogManager.getLogger(MServerGUI.class);
     private static final String FILE_EXTENSION_SEPERATOR = ".";
 
     private static final String BUNDLE_KEY_SELECTION_VIEW_TARGET = "selectionView.target";
 
     private static final String BUNDLE_KEY_SELECTION_VIEW_SOURCE = "selectionView.source";
-    private static final String CONSOLE_PATTERN = "%s - %s";
 
     private final CrawlerManager crawlerManager;
 
@@ -75,6 +72,9 @@ public class MServerGUI extends Application
 
     @FXML
     private PieChart statisticChart;
+
+    @FXML
+    private BarChart<String, Number> processChart;
 
     @FXML
     private ListView<String> messageList;
@@ -94,9 +94,15 @@ public class MServerGUI extends Application
     @FXML
     private CheckBox debugCheckBox;
 
+    @FXML
+    private TabPane mainTabPane;
+
     private final ResourceBundle bundle;
     private ObservableList<String> messages;
     private ObservableList<Data> pieChartData;
+    private MessageUpdator messageUpdator;
+    private MessageTask messageTask;
+    private ObservableList<Series<String, Number>> processChartData;
 
     public MServerGUI()
     {
@@ -111,24 +117,6 @@ public class MServerGUI extends Application
 
         final Scene scene = new Scene(root);
         aPrimaryStage.setScene(scene);
-
-        final MessageTask messageTask = new MessageTask();
-        messageTask.valueProperty().addListener(new ChangeListener<MessageWrapper>()
-        {
-
-            @Override
-            public void changed(final ObservableValue<? extends MessageWrapper> aObservable,
-                    final MessageWrapper aOldValue, final MessageWrapper aNewValue)
-            {
-                Platform.runLater(() -> {
-                    printMessage(aNewValue);
-                });
-            }
-        });
-
-        crawlerManager.addMessageListener(messageTask);
-
-        aPrimaryStage.setOnCloseRequest((event) -> messageTask.setShouldRun(false));
 
         aPrimaryStage.show();
     }
@@ -146,22 +134,47 @@ public class MServerGUI extends Application
         pieChartData = FXCollections.observableArrayList();
         statisticChart.setData(pieChartData);
 
+        processChartData = FXCollections.observableArrayList();
+        processChart.setData(processChartData);
+
         messages = FXCollections.observableArrayList();
         messageList.setItems(messages);
+
+        messageUpdator = new MessageUpdator(messages, debugCheckBox);
+        messageTask = new MessageTask();
+        messageTask.valueProperty().addListener(new ChangeListener<MessageWrapper>()
+        {
+
+            @Override
+            public void changed(final ObservableValue<? extends MessageWrapper> aObservable,
+                    final MessageWrapper aOldValue, final MessageWrapper aNewValue)
+            {
+                messageUpdator.offerMessage(aNewValue);
+            }
+        });
+        new Thread(messageUpdator).start();
+        crawlerManager.addMessageListener(messageTask);
     }
 
     @FXML
     protected void quit()
     {
+        messageTask.stop();
+        messageUpdator.stop();
         Platform.exit();
     }
 
     @FXML
     public void startCrawler()
     {
-        final CrawlerTask crawlerTask = new CrawlerTask(bundle, pieChartData, crawlerSelectionView.getTargetItems());
+        mainTabPane.getSelectionModel().select(DETAILS_TAB_INDEX);
+        final CrawlerTask crawlerTask =
+                new CrawlerTask(bundle, pieChartData, processChartData, crawlerSelectionView.getTargetItems());
+        crawlerTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                (final WorkerStateEvent t) -> enableControls());
         progressBar.progressProperty().bind(crawlerTask.progressProperty());
         new Thread(crawlerTask).start();
+        disableControls();
     }
 
     @FXML
@@ -273,41 +286,6 @@ public class MServerGUI extends Application
     {
         return new ExtensionFilter(aFilmlistFormats.name(),
                 FILE_EXTENSION_SEPERATOR + aFilmlistFormats.getFileExtension());
-    }
-
-    private void printMessage(final MessageWrapper aMessageWrapper)
-    {
-        switch (aMessageWrapper.getType())
-        {
-        case DEBUG:
-            if (debugCheckBox.isSelected())
-            {
-                messageToConsole(aMessageWrapper.getMessage());
-            }
-            break;
-        case INFO:
-        case WARNING:
-            messageToConsole(aMessageWrapper.getMessage());
-            break;
-        default:
-            messageToDialog(aMessageWrapper.getMessage());
-        }
-    }
-
-    private void messageToDialog(final String aMessage)
-    {
-        final Alert alert = new Alert(AlertType.ERROR);
-        final Text text = new Text(aMessage);
-        text.setWrappingWidth(alert.getWidth());
-        alert.getDialogPane().setContent(text);
-        alert.show();
-    }
-
-    private void messageToConsole(final String aMessageText)
-    {
-        messages.add(String.format(CONSOLE_PATTERN,
-                LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), aMessageText));
-
     }
 
 }

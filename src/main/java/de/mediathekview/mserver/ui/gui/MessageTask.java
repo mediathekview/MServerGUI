@@ -1,14 +1,24 @@
 package de.mediathekview.mserver.ui.gui;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import de.mediathekview.mlib.messages.Message;
 import de.mediathekview.mlib.messages.MessageUtil;
 import de.mediathekview.mlib.messages.listener.MessageListener;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 public class MessageTask extends Task<MessageWrapper> implements MessageListener
 {
 
-    private boolean shouldRun = true;
+    private boolean shouldRun;
+    private final ConcurrentLinkedQueue<MessageWrapper> messageQue;
+
+    public MessageTask()
+    {
+        messageQue = new ConcurrentLinkedQueue<>();
+        shouldRun = true;
+    }
 
     @Override
     protected MessageWrapper call() throws Exception
@@ -23,18 +33,17 @@ public class MessageTask extends Task<MessageWrapper> implements MessageListener
     @Override
     public void consumeMessage(final Message aMessage, final Object... aParameter)
     {
-        updateValue(new MessageWrapper(String.format(MessageUtil.getInstance().loadMessageText(aMessage), aParameter),
-                aMessage.getMessageType()));
+        messageQue.offer(
+                new MessageWrapper(String.format(MessageUtil.getInstance().loadMessageText(aMessage), aParameter),
+                        aMessage.getMessageType()));
+
+        Platform.runLater(() -> updateValue(messageQue.poll()));
     }
 
-    public boolean isShouldRun()
+    public void stop()
     {
-        return shouldRun;
-    }
+        shouldRun = false;
 
-    public void setShouldRun(final boolean aShouldRun)
-    {
-        shouldRun = aShouldRun;
     }
 
 }
