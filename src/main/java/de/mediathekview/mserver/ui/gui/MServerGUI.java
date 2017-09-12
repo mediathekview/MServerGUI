@@ -11,12 +11,14 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.ListSelectionView;
 
 import de.mediathekview.mlib.daten.Sender;
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
+import de.mediathekview.mserver.base.config.MServerConfigManager;
 import de.mediathekview.mserver.crawler.CrawlerManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -107,6 +109,8 @@ public class MServerGUI extends Application
     public MServerGUI()
     {
         crawlerManager = CrawlerManager.getInstance();
+        // TODO move to settings menu
+        MServerConfigManager.getInstance().getConfig().getLogSettings().setLogLevelConsole(Level.ALL);
         bundle = ResourceBundle.getBundle("MServerGUI", Locale.getDefault());
     }
 

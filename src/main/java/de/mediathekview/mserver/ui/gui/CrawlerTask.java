@@ -6,6 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.util.concurrent.AtomicDouble;
 
 import de.mediathekview.mlib.daten.Sender;
@@ -23,6 +26,8 @@ import javafx.scene.chart.XYChart.Series;
 
 public class CrawlerTask extends Task<Void>
 {
+
+    private static final Logger LOG = LogManager.getLogger(CrawlerTask.class);
     private final ObservableList<Sender> senderToCrawl;
     private final AtomicDouble progressSum;
     private final ObservableList<Data> pieChartData;
@@ -34,9 +39,9 @@ public class CrawlerTask extends Task<Void>
     private final ConcurrentHashMap<Sender, AtomicLong> senderActualCounts;
     private final ConcurrentHashMap<Sender, AtomicLong> senderErrorCounts;
     private final ObservableList<Series<String, Number>> processChartData;
-    private final ConcurrentHashMap<Series<String, Number>, BarChart.Data<String, Number>> senderSeriesData;
+    private final ConcurrentHashMap<Series<String, Number>, ConcurrentHashMap<Long, BarChart.Data<String, Number>>> senderSeriesData;
     private final ConcurrentHashMap<Sender, Series<String, Number>> senderSerieses;
-    private final ConcurrentHashMap<Sender, ConcurrentHashMap<String, AtomicLong>> senderThreadData;
+    private final ConcurrentHashMap<Sender, ConcurrentHashMap<Long, AtomicLong>> senderThreadData;
 
     public CrawlerTask(final ResourceBundle aResourceBundle, final ObservableList<Data> aCrawlerStatisticData,
             final ObservableList<Series<String, Number>> aProcessChartData, final ObservableList<Sender> aSender)
@@ -110,8 +115,9 @@ public class CrawlerTask extends Task<Void>
         {
             if (aProgress.getActualCount() > 0 || aProgress.getErrorCount() > 0)
             {
-                final String threadName = Thread.currentThread().getName();
-                final ConcurrentHashMap<String, AtomicLong> senderData;
+                final long threadId = Thread.currentThread().getId();
+                LOG.debug("Thread | " + threadId + " | " + Thread.currentThread().getName());
+                final ConcurrentHashMap<Long, AtomicLong> senderData;
                 if (senderThreadData.containsKey(aSender))
                 {
                     senderData = senderThreadData.get(aSender);
@@ -122,9 +128,9 @@ public class CrawlerTask extends Task<Void>
                     senderThreadData.put(aSender, senderData);
                 }
                 AtomicLong threadCount;
-                if (senderData.containsKey(threadName))
+                if (senderData.containsKey(threadId))
                 {
-                    threadCount = senderData.get(threadName);
+                    threadCount = senderData.get(threadId);
                 }
                 else
                 {
@@ -132,7 +138,7 @@ public class CrawlerTask extends Task<Void>
                 }
 
                 threadCount.getAndIncrement();
-                senderData.put(threadName, threadCount);
+                senderData.put(threadId, threadCount);
             }
         }
 
@@ -147,27 +153,39 @@ public class CrawlerTask extends Task<Void>
             updateThreadChart();
         }
 
-        private void updateThreadChart()
+        private synchronized void updateThreadChart()
         {
-            for (final Entry<Sender, ConcurrentHashMap<String, AtomicLong>> senderDataEntry : senderThreadData
-                    .entrySet())
+            for (final Entry<Sender, ConcurrentHashMap<Long, AtomicLong>> senderDataEntry : senderThreadData.entrySet())
             {
                 final Series<String, Number> senderSeries = senderSerieses.get(senderDataEntry.getKey());
-                for (final Entry<String, AtomicLong> threadDataEntry : senderDataEntry.getValue().entrySet())
+                final ConcurrentHashMap<Long, BarChart.Data<String, Number>> senderData;
+                if (senderSeriesData.contains(senderSeries))
+                {
+                    senderData = senderSeriesData.get(senderSeries);
+                }
+                else
+                {
+                    senderData = new ConcurrentHashMap<>();
+                    senderSeriesData.put(senderSeries, senderData);
+                }
+
+                for (final Entry<Long, AtomicLong> threadDataEntry : senderDataEntry.getValue().entrySet())
                 {
 
-                    if (senderSeriesData.contains(senderSeries))
+                    final BarChart.Data<String, Number> senderSeriesThreadData;
+                    if (senderData.containsKey(threadDataEntry.getKey()))
                     {
-                        senderSeriesData.get(senderSeries).setYValue(threadDataEntry.getValue().get());
+                        senderSeriesThreadData = senderData.get(threadDataEntry.getKey());
+                        senderSeriesThreadData.setYValue(threadDataEntry.getValue().get());
                     }
                     else
                     {
-                        final BarChart.Data<String, Number> newSenderSeriesData =
-                                new BarChart.Data<>(threadDataEntry.getKey(), threadDataEntry.getValue().get());
-
-                        senderSeriesData.put(senderSeries, newSenderSeriesData);
-                        senderSeries.getData().add(newSenderSeriesData);
+                        senderSeriesThreadData = new BarChart.Data<>(threadDataEntry.getKey().toString(),
+                                threadDataEntry.getValue().get());
+                        senderData.put(threadDataEntry.getKey(), senderSeriesThreadData);
+                        senderSeries.getData().add(senderSeriesThreadData);
                     }
+
                 }
             }
         }
