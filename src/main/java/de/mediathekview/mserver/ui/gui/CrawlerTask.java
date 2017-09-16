@@ -36,10 +36,10 @@ public class CrawlerTask extends Task<Void>
     private final PieChart.Data datafinished;
     private final PieChart.Data dataWorking;
 
-    private final ConcurrentHashMap<Sender, ConcurrentHashMap<Long, AtomicLong>> threadsData;
+    private final ConcurrentHashMap<Sender, ConcurrentHashMap<String, AtomicLong>> threadsData;
 
     private final ConcurrentHashMap<Sender, Series<String, Number>> seariesUIData;
-    private final ConcurrentHashMap<Series<String, Number>, ConcurrentHashMap<Long, BarChart.Data<String, Number>>> threadsUIData;
+    private final ConcurrentHashMap<Series<String, Number>, ConcurrentHashMap<String, BarChart.Data<String, Number>>> threadsUIData;
 
     private final ConcurrentHashMap<Sender, AtomicLong> senderMaxCounts;
     private final ConcurrentHashMap<Sender, AtomicLong> senderActualCounts;
@@ -103,6 +103,8 @@ public class CrawlerTask extends Task<Void>
         @Override
         public void updateProgess(final Sender aSender, final Progress aProgress)
         {
+            LOG.debug(aProgress.calcProgressInPercent() + "% Progress: " + aProgress.getActualCount() + " of "
+                    + aProgress.getMaxCount() + " with " + aProgress.getErrorCount() + " Errors.");
             progressQue.offer(new SenderProgressWraper(aProgress, aSender));
             addNewThreadData(aSender, aProgress);
             Platform.runLater(() -> updateForProgressFromQue());
@@ -112,10 +114,9 @@ public class CrawlerTask extends Task<Void>
         {
             if (aProgress.getActualCount() > 0 || aProgress.getErrorCount() > 0)
             {
-                final long threadId = Thread.currentThread().getId();
-                LOG.debug("Thread | " + threadId + " | " + Thread.currentThread().getName());
+                final String threadName = Thread.currentThread().getName();
 
-                ConcurrentHashMap<Long, AtomicLong> senderData;
+                ConcurrentHashMap<String, AtomicLong> senderData;
                 if (threadsData.containsKey(aSender))
                 {
                     senderData = threadsData.get(aSender);
@@ -127,14 +128,14 @@ public class CrawlerTask extends Task<Void>
                 }
 
                 AtomicLong threadData;
-                if (senderData.containsKey(threadId))
+                if (senderData.containsKey(threadName))
                 {
-                    threadData = senderData.get(threadId);
+                    threadData = senderData.get(threadName);
                 }
                 else
                 {
                     threadData = new AtomicLong(0);
-                    senderData.put(threadId, threadData);
+                    senderData.put(threadName, threadData);
                 }
                 threadData.incrementAndGet();
             }
@@ -153,7 +154,7 @@ public class CrawlerTask extends Task<Void>
 
         private synchronized void updateThreadChart()
         {
-            for (final Entry<Sender, ConcurrentHashMap<Long, AtomicLong>> senderDataEntry : threadsData.entrySet())
+            for (final Entry<Sender, ConcurrentHashMap<String, AtomicLong>> senderDataEntry : threadsData.entrySet())
             {
                 Series<String, Number> senderSeries;
                 if (seariesUIData.containsKey(senderDataEntry.getKey()))
@@ -168,9 +169,9 @@ public class CrawlerTask extends Task<Void>
                     processChartData.add(senderSeries);
                 }
 
-                for (final Entry<Long, AtomicLong> progressDataEntry : senderDataEntry.getValue().entrySet())
+                for (final Entry<String, AtomicLong> progressDataEntry : senderDataEntry.getValue().entrySet())
                 {
-                    ConcurrentHashMap<Long, BarChart.Data<String, Number>> seriesChartData;
+                    ConcurrentHashMap<String, BarChart.Data<String, Number>> seriesChartData;
                     if (threadsUIData.containsKey(senderSeries))
                     {
                         seriesChartData = threadsUIData.get(senderSeries);
@@ -188,7 +189,7 @@ public class CrawlerTask extends Task<Void>
                     }
                     else
                     {
-                        threadChartData = new BarChart.Data<>(progressDataEntry.getKey().toString(), 0l);
+                        threadChartData = new BarChart.Data<>(progressDataEntry.getKey(), 0l);
                         seriesChartData.put(progressDataEntry.getKey(), threadChartData);
                         senderSeries.getData().add(threadChartData);
                     }

@@ -11,18 +11,16 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.ListSelectionView;
 
 import de.mediathekview.mlib.daten.Sender;
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
-import de.mediathekview.mserver.base.config.MServerConfigManager;
+import de.mediathekview.mlib.messages.MessageTypes;
 import de.mediathekview.mserver.crawler.CrawlerManager;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -100,7 +98,6 @@ public class MServerGUI extends Application
     private TabPane mainTabPane;
 
     private final ResourceBundle bundle;
-    private ObservableList<String> messages;
     private ObservableList<Data> pieChartData;
     private MessageUpdator messageUpdator;
     private MessageTask messageTask;
@@ -109,8 +106,6 @@ public class MServerGUI extends Application
     public MServerGUI()
     {
         crawlerManager = CrawlerManager.getInstance();
-        // TODO move to settings menu
-        MServerConfigManager.getInstance().getConfig().getLogSettings().setLogLevelConsole(Level.ALL);
         bundle = ResourceBundle.getBundle("MServerGUI", Locale.getDefault());
     }
 
@@ -141,20 +136,14 @@ public class MServerGUI extends Application
         processChartData = FXCollections.observableArrayList();
         processChart.setData(processChartData);
 
-        messages = FXCollections.observableArrayList();
+        final ObservableList<String> messages = FXCollections.observableArrayList();
         messageList.setItems(messages);
 
         messageUpdator = new MessageUpdator(messages, debugCheckBox);
         messageTask = new MessageTask();
-        messageTask.valueProperty().addListener(new ChangeListener<MessageWrapper>()
-        {
-
-            @Override
-            public void changed(final ObservableValue<? extends MessageWrapper> aObservable,
-                    final MessageWrapper aOldValue, final MessageWrapper aNewValue)
-            {
-                messageUpdator.offerMessage(aNewValue);
-            }
+        messageTask.valueProperty().addListener((final ObservableValue<? extends MessageWrapper> aObservable,
+                final MessageWrapper aOldValue, final MessageWrapper aNewValue) -> {
+            messageUpdator.offerMessage(aNewValue);
         });
         new Thread(messageUpdator).start();
         crawlerManager.addMessageListener(messageTask);
@@ -165,7 +154,9 @@ public class MServerGUI extends Application
     {
         messageTask.stop();
         messageUpdator.stop();
+        crawlerManager.stop();
         Platform.exit();
+        System.exit(0);
     }
 
     @FXML
@@ -182,9 +173,42 @@ public class MServerGUI extends Application
     }
 
     @FXML
-    public void openSaveDialog()
+    public void openSaveDialog(final Event aEvent)
     {
-        // TODO
+        boolean hasError = false;
+        do
+        {
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle(bundle.getString("titles.dialogs.save"));
+
+            final List<ExtensionFilter> extensionFilters =
+                    Arrays.stream(FilmlistFormats.values()).map(this::toExtensionFilter).collect(Collectors.toList());
+            fileChooser.getExtensionFilters().addAll(extensionFilters);
+
+            final File selectedFile = fileChooser.showSaveDialog(eventToStage(aEvent));
+            if (selectedFile == null)
+            {
+                hasError = false;
+            }
+            else
+            {
+                final Path selectedPath = selectedFile.toPath();
+                if (Files.isWritable(selectedPath) || Files.isWritable(selectedPath.getParent()))
+                {
+                    hasError = false;
+                    final FilmlistFormats saveFormat = FilmlistFormats
+                            .valueOf(fileChooser.selectedExtensionFilterProperty().get().getDescription());
+                    crawlerManager.saveFilmlist(selectedPath, saveFormat);
+                }
+                else
+                {
+                    hasError = true;
+                    messageUpdator.offerMessage(
+                            new MessageWrapper(bundle.getString("error.noSaveRights"), MessageTypes.ERROR));
+                }
+            }
+        }
+        while (hasError);
     }
 
     @FXML
@@ -196,14 +220,18 @@ public class MServerGUI extends Application
             do
             {
                 final FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open Resource File");
+                fileChooser.setTitle(bundle.getString("titles.dialogs.import"));
 
                 final List<ExtensionFilter> extensionFilters = Arrays.stream(FilmlistFormats.values())
                         .map(this::toExtensionFilter).collect(Collectors.toList());
                 fileChooser.getExtensionFilters().addAll(extensionFilters);
 
                 final File selectedFile = fileChooser.showOpenDialog(eventToStage(aEvent));
-                if (selectedFile != null)
+                if (selectedFile == null)
+                {
+                    hasError = false;
+                }
+                else
                 {
                     final Path selectedPath = selectedFile.toPath();
                     if (Files.exists(selectedPath) && Files.isReadable(selectedPath))
