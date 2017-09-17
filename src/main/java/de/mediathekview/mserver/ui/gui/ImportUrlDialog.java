@@ -44,7 +44,7 @@ public class ImportUrlDialog extends Dialog<ImportUrlResult>
         final ComboBox<FilmlistFormats> formatComboBox =
                 (ComboBox<FilmlistFormats>) dialogPane.lookup("#formatComboBox");
 
-        setResultConverter((dialogButton) -> {
+        setResultConverter(dialogButton -> {
             final ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
             return data == ButtonData.OK_DONE ? new ImportUrlResult(urlInput.getText(), formatComboBox.getValue())
                     : null;

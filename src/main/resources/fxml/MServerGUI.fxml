@@ -27,14 +27,14 @@
       <menus>
         <Menu mnemonicParsing="false" text="%menu.title.file">
           <items>
-            <MenuItem mnemonicParsing="false" text="%menu.title.preferences" />
+            <MenuItem mnemonicParsing="false" text="%menu.title.preferences" onAction="#openPreferences" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" onAction="#quit" text="%menu.title.quit" />
+            <MenuItem mnemonicParsing="false" onAction="#quit" text="%menu.title.quit" onAction="#quit"/>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="%menu.title.help">
           <items>
-            <MenuItem mnemonicParsing="false" text="%menu.title.about" />
+            <MenuItem mnemonicParsing="false" text="%menu.title.about" onAction="#openAbout"/>
           </items>
         </Menu>
       </menus>

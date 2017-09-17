@@ -47,7 +47,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-//TODO Add information que for Messages and Progress + Statistic. Other Threads add info to que. One FX Task runs the que and updates the vui.
 public class MServerGUI extends Application
 {
 
@@ -141,10 +140,9 @@ public class MServerGUI extends Application
 
         messageUpdator = new MessageUpdator(messages, debugCheckBox);
         messageTask = new MessageTask();
-        messageTask.valueProperty().addListener((final ObservableValue<? extends MessageWrapper> aObservable,
-                final MessageWrapper aOldValue, final MessageWrapper aNewValue) -> {
-            messageUpdator.offerMessage(aNewValue);
-        });
+        messageTask.valueProperty().addListener(
+                (final ObservableValue<? extends MessageWrapper> aObservable, final MessageWrapper aOldValue,
+                        final MessageWrapper aNewValue) -> messageUpdator.offerMessage(aNewValue));
         new Thread(messageUpdator).start();
         crawlerManager.addMessageListener(messageTask);
     }
@@ -306,6 +304,16 @@ public class MServerGUI extends Application
             }
             disableControls();
         }
+
+    }
+
+    public void openPreferences()
+    {
+
+    }
+
+    public void openAbout()
+    {
 
     }
 
