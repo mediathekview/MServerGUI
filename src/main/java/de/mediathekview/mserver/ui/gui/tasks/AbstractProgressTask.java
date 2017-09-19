@@ -1,13 +1,8 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.tasks;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-import de.mediathekview.mlib.daten.Film;
-import de.mediathekview.mlib.filmlisten.FilmlistFormats;
-import de.mediathekview.mserver.crawler.CrawlerManager;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXMLLoader;
@@ -18,45 +13,26 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class FilmlistImportTask extends Task<Void>
+public abstract class AbstractProgressTask extends Task<Void>
 {
+    private static final String FXML_PROGRESS_FXML = "fxml/Progress.fxml";
     private Stage stage;
-
-    private final ObservableList<Film> filmlist;
-
     private final Stage parentStage;
-
-    private final FilmlistFormats filmlistFormat;
-
-    private final String url;
-
     private final ResourceBundle resourceBundle;
 
-    public FilmlistImportTask(final Stage aParentStage, final ResourceBundle aResourceBundle,
-            final FilmlistFormats aFilmlistFormat, final String aUrl) throws IOException
+    public AbstractProgressTask(final Stage aParentStage, final ResourceBundle aResourceBundle) throws IOException
     {
         parentStage = aParentStage;
         resourceBundle = aResourceBundle;
-        filmlistFormat = aFilmlistFormat;
-        url = aUrl;
-        filmlist = FXCollections.emptyObservableList();
-
-        this.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (final WorkerStateEvent t) -> {
-            stopDialog();
-        });
+        this.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (final WorkerStateEvent t) -> stopDialog());
 
         initDialog();
-    }
-
-    public ObservableList<Film> getFilmlist()
-    {
-        return filmlist;
     }
 
     private void initDialog() throws IOException
     {
         final VBox progressBox =
-                FXMLLoader.load(getClass().getClassLoader().getResource("fxml/ImportProgress.fxml"), resourceBundle);
+                FXMLLoader.load(getClass().getClassLoader().getResource(FXML_PROGRESS_FXML), resourceBundle);
 
         final ProgressBar progressBar = (ProgressBar) progressBox.lookup("#progress");
         progressBar.progressProperty().bind(progressProperty());
@@ -84,9 +60,10 @@ public class FilmlistImportTask extends Task<Void>
     @Override
     protected Void call() throws Exception
     {
-        CrawlerManager.getInstance().importFilmlist(filmlistFormat, url);
+        doWork();
         updateProgress(1, 1);
         return null;
     }
 
+    protected abstract void doWork();
 }

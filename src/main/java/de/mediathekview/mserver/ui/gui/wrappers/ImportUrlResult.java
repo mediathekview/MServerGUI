@@ -1,4 +1,4 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.wrappers;
 
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
 

@@ -21,15 +21,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ListSelectionView?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
+<VBox prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.mediathekview.mserver.ui.gui.MServerGUI">
   <children>
     <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="%menu.title.file">
           <items>
-            <MenuItem mnemonicParsing="false" text="%menu.title.preferences" onAction="#openPreferences" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" onAction="#quit" text="%menu.title.quit" onAction="#quit"/>
+            <MenuItem mnemonicParsing="false" text="%menu.title.quit" onAction="#quit"/>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="%menu.title.help">

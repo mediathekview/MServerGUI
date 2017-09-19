@@ -2,6 +2,7 @@ package de.mediathekview.mserver.ui.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -19,6 +20,15 @@ import de.mediathekview.mlib.daten.Sender;
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
 import de.mediathekview.mlib.messages.MessageTypes;
 import de.mediathekview.mserver.crawler.CrawlerManager;
+import de.mediathekview.mserver.ui.gui.dialogs.AboutDialog;
+import de.mediathekview.mserver.ui.gui.dialogs.ImportUrlDialog;
+import de.mediathekview.mserver.ui.gui.tasks.CrawlerTask;
+import de.mediathekview.mserver.ui.gui.tasks.FilmlistImportTask;
+import de.mediathekview.mserver.ui.gui.tasks.FilmlistSaveTask;
+import de.mediathekview.mserver.ui.gui.tasks.MessageTask;
+import de.mediathekview.mserver.ui.gui.tasks.MessageUpdator;
+import de.mediathekview.mserver.ui.gui.wrappers.ImportUrlResult;
+import de.mediathekview.mserver.ui.gui.wrappers.MessageWrapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -117,6 +127,7 @@ public class MServerGUI extends Application
         aPrimaryStage.setScene(scene);
 
         aPrimaryStage.show();
+        aPrimaryStage.setOnCloseRequest((event) -> quit());
     }
 
     @FXML
@@ -150,8 +161,14 @@ public class MServerGUI extends Application
     @FXML
     protected void quit()
     {
-        messageTask.stop();
-        messageUpdator.stop();
+        if (messageTask != null)
+        {
+            messageTask.stop();
+        }
+        if (messageUpdator != null)
+        {
+            messageUpdator.stop();
+        }
         crawlerManager.stop();
         Platform.exit();
         System.exit(0);
@@ -196,7 +213,19 @@ public class MServerGUI extends Application
                     hasError = false;
                     final FilmlistFormats saveFormat = FilmlistFormats
                             .valueOf(fileChooser.selectedExtensionFilterProperty().get().getDescription());
-                    crawlerManager.saveFilmlist(selectedPath, saveFormat);
+                    try
+                    {
+                        final FilmlistSaveTask saveTask =
+                                new FilmlistSaveTask(eventToStage(aEvent), bundle, saveFormat, selectedPath);
+                        saveTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                                (final WorkerStateEvent t) -> enableControls());
+                        new Thread(saveTask).start();
+                    }
+                    catch (final IOException ioException)
+                    {
+                        LOG.fatal("Unexpected error while saving the film list.", ioException);
+                        throw new IllegalStateException(ioException);
+                    }
                 }
                 else
                 {
@@ -307,14 +336,21 @@ public class MServerGUI extends Application
 
     }
 
-    public void openPreferences()
-    {
-
-    }
-
     public void openAbout()
     {
-
+        AboutDialog aboutDialog;
+        try
+        {
+            aboutDialog = new AboutDialog(bundle);
+            aboutDialog.setResizable(false);
+            aboutDialog.show();
+        }
+        catch (final IOException | URISyntaxException exception)
+        {
+            LOG.fatal("Something went wrong while opening the about dialog.", exception);
+            messageUpdator
+                    .offerMessage(new MessageWrapper(bundle.getString("error.fxmlIoError"), MessageTypes.FATAL_ERROR));
+        }
     }
 
     public static final Stage eventToStage(final Event aEvent)

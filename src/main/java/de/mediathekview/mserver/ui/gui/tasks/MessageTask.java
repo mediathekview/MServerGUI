@@ -1,10 +1,11 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.tasks;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.mediathekview.mlib.messages.Message;
 import de.mediathekview.mlib.messages.MessageUtil;
 import de.mediathekview.mlib.messages.listener.MessageListener;
+import de.mediathekview.mserver.ui.gui.wrappers.MessageWrapper;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 

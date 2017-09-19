@@ -1,4 +1,4 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.dialogs;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -14,6 +14,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
+import de.mediathekview.mserver.ui.gui.wrappers.ImportUrlResult;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;

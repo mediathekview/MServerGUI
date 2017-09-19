@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Label alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="MServer GUI">
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Label>
-      <Label maxWidth="1.7976931348623157E308" text="%texts.dialogs.about.version" />
-      <Label maxWidth="1.7976931348623157E308" text="%texts.dialogs.about.authors" />
-   </children>
-</VBox>
+<DialogPane prefHeight="520" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+	<content>
+		<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+			<children>
+				<Label fx:id="versionLabel" maxWidth="1.7976931348623157E308" text="%texts.dialogs.about.version" />
+				<Label maxWidth="1.7976931348623157E308" text="%texts.dialogs.about.authors" />
+			</children>
+		</VBox>
+	</content>
+	<header>
+		<Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="MServer GUI" textAlignment="CENTER">
+			<font>
+				<Font name="System Bold" size="14.0" />
+			</font>
+		</Label>
+	</header>
+</DialogPane>

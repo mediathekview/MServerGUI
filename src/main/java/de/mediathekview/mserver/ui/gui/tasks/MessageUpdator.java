@@ -1,4 +1,4 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.tasks;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.mediathekview.mserver.ui.gui.wrappers.MessageWrapper;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;

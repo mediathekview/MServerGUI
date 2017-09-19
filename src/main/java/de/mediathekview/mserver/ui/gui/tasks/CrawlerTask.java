@@ -1,4 +1,4 @@
-package de.mediathekview.mserver.ui.gui;
+package de.mediathekview.mserver.ui.gui.tasks;
 
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
@@ -15,6 +15,7 @@ import de.mediathekview.mlib.daten.Sender;
 import de.mediathekview.mlib.progress.Progress;
 import de.mediathekview.mserver.crawler.CrawlerManager;
 import de.mediathekview.mserver.progress.listeners.SenderProgressListener;
+import de.mediathekview.mserver.ui.gui.wrappers.SenderProgressWraper;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
