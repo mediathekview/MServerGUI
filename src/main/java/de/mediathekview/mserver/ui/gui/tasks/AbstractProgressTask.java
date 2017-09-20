@@ -1,8 +1,9 @@
 package de.mediathekview.mserver.ui.gui.tasks;
 
+import static de.mediathekview.mserver.ui.gui.Consts.FXML_PROGRESS_FXML;
+import static de.mediathekview.mserver.ui.gui.Consts.FX_ID_PROGRESS;
 import java.io.IOException;
 import java.util.ResourceBundle;
-
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXMLLoader;
@@ -13,57 +14,54 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public abstract class AbstractProgressTask extends Task<Void>
-{
-    private static final String FXML_PROGRESS_FXML = "fxml/Progress.fxml";
-    private Stage stage;
-    private final Stage parentStage;
-    private final ResourceBundle resourceBundle;
+public abstract class AbstractProgressTask extends Task<Void> {
 
-    public AbstractProgressTask(final Stage aParentStage, final ResourceBundle aResourceBundle) throws IOException
-    {
-        parentStage = aParentStage;
-        resourceBundle = aResourceBundle;
-        this.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, (final WorkerStateEvent t) -> stopDialog());
+  private Stage stage;
+  private final Stage parentStage;
+  private final ResourceBundle resourceBundle;
 
-        initDialog();
-    }
+  public AbstractProgressTask(final Stage aParentStage, final ResourceBundle aResourceBundle)
+      throws IOException {
+    parentStage = aParentStage;
+    resourceBundle = aResourceBundle;
+    this.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        (final WorkerStateEvent t) -> stopDialog());
 
-    private void initDialog() throws IOException
-    {
-        final VBox progressBox =
-                FXMLLoader.load(getClass().getClassLoader().getResource(FXML_PROGRESS_FXML), resourceBundle);
+    initDialog();
+  }
 
-        final ProgressBar progressBar = (ProgressBar) progressBox.lookup("#progress");
-        progressBar.progressProperty().bind(progressProperty());
+  private void initDialog() throws IOException {
+    final VBox progressBox = FXMLLoader
+        .load(getClass().getClassLoader().getResource(FXML_PROGRESS_FXML), resourceBundle);
 
-        final Scene scene = new Scene(progressBox);
-        final double centerXPosition = parentStage.getX() + parentStage.getWidth() / 2d;
-        final double centerYPosition = parentStage.getY() + parentStage.getHeight() / 2d;
+    final ProgressBar progressBar = (ProgressBar) progressBox.lookup(FX_ID_PROGRESS);
+    progressBar.progressProperty().bind(progressProperty());
 
-        stage = new Stage();
-        stage.setX(centerXPosition);
-        stage.setY(centerYPosition);
-        stage.initOwner(parentStage);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setAlwaysOnTop(true);
-        stage.setScene(scene);
-        stage.show();
-    }
+    final Scene scene = new Scene(progressBox);
+    final double centerXPosition = parentStage.getX() + parentStage.getWidth() / 2d;
+    final double centerYPosition = parentStage.getY() + parentStage.getHeight() / 2d;
 
-    private void stopDialog()
-    {
-        stage.close();
-    }
+    stage = new Stage();
+    stage.setX(centerXPosition);
+    stage.setY(centerYPosition);
+    stage.initOwner(parentStage);
+    stage.initModality(Modality.APPLICATION_MODAL);
+    stage.initStyle(StageStyle.TRANSPARENT);
+    stage.setAlwaysOnTop(true);
+    stage.setScene(scene);
+    stage.show();
+  }
 
-    @Override
-    protected Void call() throws Exception
-    {
-        doWork();
-        updateProgress(1, 1);
-        return null;
-    }
+  private void stopDialog() {
+    stage.close();
+  }
 
-    protected abstract void doWork();
+  @Override
+  protected Void call() throws Exception {
+    doWork();
+    updateProgress(1, 1);
+    return null;
+  }
+
+  protected abstract void doWork();
 }
