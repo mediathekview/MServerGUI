@@ -62,6 +62,7 @@ dependencies {
     
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "junit:junit:4.12"
     
 }
 
@@ -160,6 +161,11 @@ distributions {
         contents {
             into('lib') {
                 from configurations.compile
+            }
+            from('scripte/runScripts') {
+                filesMatching('**') {
+                    filter(ReplaceTokens, tokens: [JARNAME: jarName])
+                }
             }
             from('build/libs') {
                 include '*.jar'

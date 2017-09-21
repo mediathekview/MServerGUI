@@ -30,6 +30,15 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
+/**
+ * The controller and the UI for the URL film list import dialog.
+ * 
+ * @author Nicklas Wiegandt (Nicklas2751)<br/>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+ *         <b>Skype:</b> Nicklas2751<br/>
+ *
+ */
 public class ImportUrlDialog extends Dialog<ImportUrlResult> {
 
   private static final Logger LOG = LogManager.getLogger(ImportUrlDialog.class);

@@ -2,6 +2,15 @@ package de.mediathekview.mserver.ui.gui.wrappers;
 
 import de.mediathekview.mlib.messages.MessageTypes;
 
+/**
+ * A wrapper class for the external incoming message information.
+ * 
+ * @author Nicklas Wiegandt (Nicklas2751)<br/>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+ *         <b>Skype:</b> Nicklas2751<br/>
+ *
+ */
 public class MessageWrapper {
   private String message;
   private MessageTypes type;

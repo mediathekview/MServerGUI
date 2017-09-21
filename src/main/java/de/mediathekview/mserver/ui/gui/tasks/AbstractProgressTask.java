@@ -1,6 +1,7 @@
 package de.mediathekview.mserver.ui.gui.tasks;
 
 import static de.mediathekview.mserver.ui.gui.Consts.FXML_PROGRESS_FXML;
+import static de.mediathekview.mserver.ui.gui.Consts.FX_ID_PROGESS_TEST;
 import static de.mediathekview.mserver.ui.gui.Consts.FX_ID_PROGRESS;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -8,12 +9,22 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+/**
+ * A abstract class which defines the basics for a tasks which works with simple progress.
+ *
+ * @author Nicklas Wiegandt (Nicklas2751)<br/>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+ *         <b>Skype:</b> Nicklas2751<br/>
+ *
+ */
 public abstract class AbstractProgressTask extends Task<Void> {
 
   private Stage stage;
@@ -33,6 +44,9 @@ public abstract class AbstractProgressTask extends Task<Void> {
   private void initDialog() throws IOException {
     final VBox progressBox = FXMLLoader
         .load(getClass().getClassLoader().getResource(FXML_PROGRESS_FXML), resourceBundle);
+
+    final Label progressText = (Label) progressBox.lookup(FX_ID_PROGESS_TEST);
+    progressText.setText(resourceBundle.getString(getProgressTextKey()));
 
     final ProgressBar progressBar = (ProgressBar) progressBox.lookup(FX_ID_PROGRESS);
     progressBar.progressProperty().bind(progressProperty());
@@ -59,9 +73,16 @@ public abstract class AbstractProgressTask extends Task<Void> {
   @Override
   protected Void call() throws Exception {
     doWork();
-    updateProgress(1, 1);
     return null;
   }
 
+  /**
+   * This method should do the work.
+   */
   protected abstract void doWork();
+
+  /**
+   * A method to gather the resource bundle key for the text to show in the dialog.
+   */
+  protected abstract String getProgressTextKey();
 }

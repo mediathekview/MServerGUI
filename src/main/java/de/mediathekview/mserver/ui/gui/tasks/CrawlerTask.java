@@ -1,5 +1,8 @@
 package de.mediathekview.mserver.ui.gui.tasks;
 
+import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_CHART_ERROR;
+import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_CHART_FINISHED;
+import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_CHART_WORKING;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +26,28 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
 import javafx.scene.chart.XYChart.Series;
 
+/**
+ * A task to run a specific crawler.
+ *
+ * @author Nicklas Wiegandt (Nicklas2751)<br/>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+ *         <b>Skype:</b> Nicklas2751<br/>
+ *
+ */
 public class CrawlerTask extends Task<Void> {
 
+
+  /**
+   * A {@link SenderProgressListener} progress listener which will be called from the crawlers on
+   * status updates.
+   *
+   * @author Nicklas Wiegandt (Nicklas2751)<br/>
+   *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+   *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+   *         <b>Skype:</b> Nicklas2751<br/>
+   *
+   */
   class LoadListener implements SenderProgressListener {
     private final ConcurrentLinkedQueue<SenderProgressWraper> progressQue;
 
@@ -36,9 +59,10 @@ public class CrawlerTask extends Task<Void> {
     public void updateProgess(final Sender aSender, final Progress aProgress) {
       LOG.debug(aProgress.calcProgressInPercent() + "% Progress: " + aProgress.getActualCount()
           + " of " + aProgress.getMaxCount() + " with " + aProgress.getErrorCount() + " Errors.");
+
       progressQue.offer(new SenderProgressWraper(aProgress, aSender));
       addNewThreadData(aSender, aProgress);
-      Platform.runLater(() -> updateForProgressFromQue());
+      Platform.runLater(this::updateForProgressFromQue);
     }
 
     private void addNewThreadData(final Sender aSender, final Progress aProgress) {
@@ -135,23 +159,23 @@ public class CrawlerTask extends Task<Void> {
   }
 
   private static final Logger LOG = LogManager.getLogger(CrawlerTask.class);
-  private final ObservableList<Sender> senderToCrawl;
-  private final AtomicDouble progressSum;
-  private final ObservableList<Data> pieChartData;
   private final PieChart.Data dataError;
   private final PieChart.Data datafinished;
-
   private final PieChart.Data dataWorking;
+  private final ObservableList<Data> pieChartData;
+  private final ObservableList<Series<String, Number>> processChartData;
 
-  private final ConcurrentHashMap<Sender, ConcurrentHashMap<String, AtomicLong>> threadsData;
+  private final AtomicDouble progressSum;
+
   private final ConcurrentHashMap<Sender, Series<String, Number>> seariesUIData;
+  private final ConcurrentHashMap<Sender, AtomicLong> senderActualCounts;
+
+  private final ConcurrentHashMap<Sender, AtomicLong> senderErrorCounts;
+  private final ConcurrentHashMap<Sender, AtomicLong> senderMaxCounts;
+  private final ObservableList<Sender> senderToCrawl;
+  private final ConcurrentHashMap<Sender, ConcurrentHashMap<String, AtomicLong>> threadsData;
 
   private final ConcurrentHashMap<Series<String, Number>, ConcurrentHashMap<String, BarChart.Data<String, Number>>> threadsUIData;
-  private final ConcurrentHashMap<Sender, AtomicLong> senderMaxCounts;
-  private final ConcurrentHashMap<Sender, AtomicLong> senderActualCounts;
-  private final ConcurrentHashMap<Sender, AtomicLong> senderErrorCounts;
-
-  private final ObservableList<Series<String, Number>> processChartData;
 
   public CrawlerTask(final ResourceBundle aResourceBundle,
       final ObservableList<Data> aCrawlerStatisticData,
@@ -160,9 +184,9 @@ public class CrawlerTask extends Task<Void> {
     senderToCrawl = aSender;
 
     pieChartData = aCrawlerStatisticData;
-    dataError = new PieChart.Data(aResourceBundle.getString("chart.error"), 0);
-    datafinished = new PieChart.Data(aResourceBundle.getString("chart.finished"), 0);
-    dataWorking = new PieChart.Data(aResourceBundle.getString("chart.working"), 0);
+    dataError = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_ERROR), 0);
+    datafinished = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_FINISHED), 0);
+    dataWorking = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_WORKING), 0);
     pieChartData.add(dataError);
     pieChartData.add(datafinished);
     pieChartData.add(dataWorking);

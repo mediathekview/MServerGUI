@@ -8,6 +8,7 @@ import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_SELECTION_VIEW_S
 import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_SELECTION_VIEW_TARGET;
 import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_TITLES_DIALOGS_IMPORT;
 import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_TITLES_DIALOGS_SAVE;
+import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_KEY_TITLE_WINDOW;
 import static de.mediathekview.mserver.ui.gui.Consts.BUNDLE_NAME;
 import static de.mediathekview.mserver.ui.gui.Consts.FXML_M_SERVER_GUI;
 import java.io.File;
@@ -76,7 +77,7 @@ import javafx.stage.Stage;
 public class MServerGUI extends Application {
   private static final int DETAILS_TAB_INDEX = 1;
   private static final Logger LOG = LogManager.getLogger(MServerGUI.class);
-  private static final String FILE_EXTENSION_SEPERATOR = ".";
+  private static final String FILE_EXTENSION_SEPERATOR = "*.";
 
 
 
@@ -252,6 +253,8 @@ public class MServerGUI extends Application {
 
   @Override
   public void start(final Stage aPrimaryStage) throws Exception {
+    aPrimaryStage.setTitle(bundle.getString(BUNDLE_KEY_TITLE_WINDOW));
+
     final Parent root =
         FXMLLoader.load(getClass().getClassLoader().getResource(FXML_M_SERVER_GUI), bundle);
 

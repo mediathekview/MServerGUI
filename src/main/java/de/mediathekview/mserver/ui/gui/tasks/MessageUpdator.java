@@ -14,6 +14,15 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.text.Text;
 
+/**
+ * A thread which waits for new external incoming messages and displays them based on their type.
+ *
+ * @author Nicklas Wiegandt (Nicklas2751)<br/>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
+ *         <b>Skype:</b> Nicklas2751<br/>
+ *
+ */
 public class MessageUpdator implements Runnable {
 
   private static final Logger LOG = LogManager.getLogger(MessageUpdator.class);
@@ -32,6 +41,12 @@ public class MessageUpdator implements Runnable {
     newMessageQuoe = new ConcurrentLinkedQueue<>();
   }
 
+  /**
+   * Takes a new wrapped message and adds it to his internal quo.
+   * 
+   * @param aMessageWrapper The new wrapped message.
+   * @see ConcurrentLinkedQueue#offer(Object)
+   */
   public void offerMessage(final MessageWrapper aMessageWrapper) {
     newMessageQuoe.offer(aMessageWrapper);
   }
@@ -40,7 +55,7 @@ public class MessageUpdator implements Runnable {
   public void run() {
     while (shouldRun) {
       if (!newMessageQuoe.isEmpty()) {
-        Platform.runLater(() -> processMessage());
+        Platform.runLater(this::processMessage);
       }
       try {
         Thread.sleep(ONE_SECEOND);

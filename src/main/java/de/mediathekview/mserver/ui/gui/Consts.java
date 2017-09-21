@@ -22,6 +22,13 @@ public final class Consts {
   public static final String BUNDLE_KEY_BUTTON_CANCEL = "button.cancel";
   public static final String BUNDLE_KEY_BUTTON_IMPORT = "button.import";
   public static final String BUNDLE_KEY_ERROR_URL_INVALID = "error.urlInvalid";
+  public static final String BUNDLE_KEY_CHART_WORKING = "chart.working";
+  public static final String BUNDLE_KEY_CHART_FINISHED = "chart.finished";
+  public static final String BUNDLE_KEY_CHART_ERROR = "chart.error";
+  public static final String BUNDLE_KEY_PROGRESS_IMPORT = "progress.importText";
+  public static final String BUNDLE_KEY_PROGRESS_SAVE = "progress.saveText";
+  public static final String BUNDLE_KEY_TITLE_WINDOW = "titles.window";
+
 
   public static final String FXML_M_SERVER_GUI = "fxml/MServerGUI.fxml";
   public static final String FXML_ABOUT_DIALOG_FXML = "fxml/AboutDialog.fxml";
@@ -37,6 +44,7 @@ public final class Consts {
   public static final String FX_ID_FORMAT_COMBO_BOX = "#formatComboBox";
   public static final String FX_ID_URL_INPUT = "#urlInput";
   public static final String FX_ID_PROGRESS = "#progress";
+  public static final String FX_ID_PROGESS_TEST = "#progressText";
 
   private Consts() {
     super();
