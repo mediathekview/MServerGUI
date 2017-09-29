@@ -88,14 +88,28 @@ public class CrawlerTask extends Task<Void> {
       }
     }
 
+    private void calcProgress(final SenderProgressWraper aProgressWrapper) {
+      AtomicDouble senderProgress;
+      if (senderProgresses.containsKey(aProgressWrapper.getSender())) {
+        senderProgress = senderProgresses.get(aProgressWrapper.getSender());
+        senderProgress.getAndSet(aProgressWrapper.getProgress().calcProgressInPercent());
+      } else {
+        senderProgress = new AtomicDouble(aProgressWrapper.getProgress().calcProgressInPercent());
+        senderProgresses.put(aProgressWrapper.getSender(), senderProgress);
+      }
+
+      final AtomicDouble sum = new AtomicDouble(0);
+      senderProgresses.values().parallelStream().map(AtomicDouble::get).forEach(sum::getAndAdd);
+
+      progressSum.getAndSet(sum.get());
+      updateProgress(progressSum.get(), 100.0d * senderProgresses.size());
+    }
+
     private void updateForProgressFromQue() {
       final SenderProgressWraper progressWrapper = progressQue.poll();
       updateSenderStatistic(progressWrapper.getSender(), progressWrapper.getProgress());
       updateStatisticData();
-      progressSum
-          .getAndSet(progressWrapper.getProgress().calcProgressInPercent() / senderToCrawl.size());
-      updateProgress(progressSum.get(), 100);
-
+      calcProgress(progressWrapper);
       updateThreadChart();
     }
 
@@ -166,6 +180,7 @@ public class CrawlerTask extends Task<Void> {
   private final ObservableList<Series<String, Number>> processChartData;
 
   private final AtomicDouble progressSum;
+  private final ConcurrentHashMap<Sender, AtomicDouble> senderProgresses;
 
   private final ConcurrentHashMap<Sender, Series<String, Number>> seariesUIData;
   private final ConcurrentHashMap<Sender, AtomicLong> senderActualCounts;
@@ -184,6 +199,7 @@ public class CrawlerTask extends Task<Void> {
     senderToCrawl = aSender;
 
     pieChartData = aCrawlerStatisticData;
+    pieChartData.clear();
     dataError = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_ERROR), 0);
     datafinished = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_FINISHED), 0);
     dataWorking = new PieChart.Data(aResourceBundle.getString(BUNDLE_KEY_CHART_WORKING), 0);
@@ -200,6 +216,7 @@ public class CrawlerTask extends Task<Void> {
     processChartData = aProcessChartData;
 
     progressSum = new AtomicDouble(0);
+    senderProgresses = new ConcurrentHashMap<>();
     senderMaxCounts = new ConcurrentHashMap<>();
     senderActualCounts = new ConcurrentHashMap<>();
     senderErrorCounts = new ConcurrentHashMap<>();
