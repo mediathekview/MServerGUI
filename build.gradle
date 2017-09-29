@@ -120,6 +120,7 @@ processResources.dependsOn updateVersion
 
 uploadArchives {
     repositories.mavenDeployer {
+        uniqueVersion=false
         Properties props = loadRepoZugangProperties()
         def nexusUser = props.getProperty('repoUser')
         def nexusPw = props.getProperty('repoPw')
