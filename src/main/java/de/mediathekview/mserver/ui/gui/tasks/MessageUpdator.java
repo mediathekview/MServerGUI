@@ -1,8 +1,11 @@
 package de.mediathekview.mserver.ui.gui.tasks;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +36,7 @@ public class MessageUpdator implements Runnable {
   private final ObservableList<String> messages;
   private final ConcurrentLinkedQueue<MessageWrapper> newMessageQuoe;
   private final CheckBox debugCheckBox;
+  private Temporal lastMessageTime;
 
   public MessageUpdator(final ObservableList<String> aMessages, final CheckBox aDebugCheckBox) {
     shouldRun = true;
@@ -43,7 +47,7 @@ public class MessageUpdator implements Runnable {
 
   /**
    * Takes a new wrapped message and adds it to his internal quo.
-   * 
+   *
    * @param aMessageWrapper The new wrapped message.
    * @see ConcurrentLinkedQueue#offer(Object)
    */
@@ -68,6 +72,11 @@ public class MessageUpdator implements Runnable {
 
   public void stop() {
     shouldRun = false;
+  }
+
+  private boolean isLastDialogOlderThen5Minutes() {
+    return Duration.between(lastMessageTime, LocalDateTime.now())
+        .compareTo(Duration.of(5, ChronoUnit.MINUTES)) <= 0;
   }
 
   private void messageToConsole(final String aMessageText) {
@@ -98,7 +107,12 @@ public class MessageUpdator implements Runnable {
         messageToConsole(aMessageWrapper.getMessage());
         break;
       default:
-        messageToDialog(aMessageWrapper.getMessage());
+        if (isLastDialogOlderThen5Minutes()) {
+          lastMessageTime = LocalDateTime.now();
+          messageToDialog(aMessageWrapper.getMessage());
+        } else {
+          messageToConsole(aMessageWrapper.getMessage());
+        }
     }
   }
 
