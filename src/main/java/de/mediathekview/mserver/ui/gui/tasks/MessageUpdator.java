@@ -75,7 +75,7 @@ public class MessageUpdator implements Runnable {
   }
 
   private boolean isLastDialogOlderThen5Minutes() {
-    return Duration.between(lastMessageTime, LocalDateTime.now())
+    return lastMessageTime == null || Duration.between(lastMessageTime, LocalDateTime.now())
         .compareTo(Duration.of(5, ChronoUnit.MINUTES)) <= 0;
   }
 
