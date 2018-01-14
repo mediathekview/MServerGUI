@@ -11,10 +11,10 @@ import javafx.stage.Stage;
 /**
  * A Task for the film list import process.
  *
- * @author Nicklas Wiegandt (Nicklas2751)<br/>
- *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
- *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
- *         <b>Skype:</b> Nicklas2751<br/>
+ * @author Nicklas Wiegandt (Nicklas2751)<br>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br>
+ *         <b>Riot.im:</b> nicklas2751:matrix.elaon.de<br>
  *
  */
 public class FilmlistSaveTask extends AbstractProgressTask {

@@ -27,6 +27,7 @@ import org.controlsfx.control.ListSelectionView;
 import de.mediathekview.mlib.daten.Sender;
 import de.mediathekview.mlib.filmlisten.FilmlistFormats;
 import de.mediathekview.mlib.messages.MessageTypes;
+import de.mediathekview.mserver.base.config.MServerConfigManager;
 import de.mediathekview.mserver.crawler.CrawlerManager;
 import de.mediathekview.mserver.ui.gui.dialogs.AboutDialog;
 import de.mediathekview.mserver.ui.gui.dialogs.ImportUrlDialog;
@@ -68,18 +69,19 @@ import javafx.stage.Stage;
 /**
  * The base class for the MServer GUI and the main controller.
  *
- * @author Nicklas Wiegandt (Nicklas2751)<br/>
- *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
- *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
- *         <b>Skype:</b> Nicklas2751<br/>
+ * @author Nicklas Wiegandt (Nicklas2751)<br>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br>
+ *         <b>Riot.im:</b> nicklas2751:matrix.elaon.de<br>
  *
  */
 public class MServerGUI extends Application {
   private static final int DETAILS_TAB_INDEX = 1;
+  static {
+    MServerConfigManager.getInstance();
+  }
   private static final Logger LOG = LogManager.getLogger(MServerGUI.class);
   private static final String FILE_EXTENSION_SEPERATOR = "*.";
-
-
 
   private final CrawlerManager crawlerManager;
 
@@ -120,6 +122,7 @@ public class MServerGUI extends Application {
   private TabPane mainTabPane;
 
   private final ResourceBundle bundle;
+
   private ObservableList<Data> pieChartData;
   private MessageUpdator messageUpdator;
   private MessageTask messageTask;
@@ -132,6 +135,10 @@ public class MServerGUI extends Application {
 
   public static final Stage eventToStage(final Event aEvent) {
     return Stage.class.cast(Control.class.cast(aEvent.getSource()).getScene().getWindow());
+  }
+
+  public static void main(final String[] args) {
+    Application.launch(args);
   }
 
   @FXML

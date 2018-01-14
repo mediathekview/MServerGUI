@@ -29,10 +29,10 @@ import javafx.scene.chart.XYChart.Series;
 /**
  * A task to run a specific crawler.
  *
- * @author Nicklas Wiegandt (Nicklas2751)<br/>
- *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
- *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
- *         <b>Skype:</b> Nicklas2751<br/>
+ * @author Nicklas Wiegandt (Nicklas2751)<br>
+ *         <b>Mail:</b> nicklas@wiegandt.eu<br>
+ *         <b>Jabber:</b> nicklas2751@elaon.de<br>
+ *         <b>Riot.im:</b> nicklas2751:matrix.elaon.de<br>
  *
  */
 public class CrawlerTask extends Task<Void> {
@@ -42,10 +42,10 @@ public class CrawlerTask extends Task<Void> {
    * A {@link SenderProgressListener} progress listener which will be called from the crawlers on
    * status updates.
    *
-   * @author Nicklas Wiegandt (Nicklas2751)<br/>
-   *         <b>Mail:</b> nicklas@wiegandt.eu<br/>
-   *         <b>Jabber:</b> nicklas2751@elaon.de<br/>
-   *         <b>Skype:</b> Nicklas2751<br/>
+   * @author Nicklas Wiegandt (Nicklas2751)<br>
+   *         <b>Mail:</b> nicklas@wiegandt.eu<br>
+   *         <b>Jabber:</b> nicklas2751@elaon.de<br>
+   *         <b>Riot.im:</b> nicklas2751:matrix.elaon.de<br>
    *
    */
   class LoadListener implements SenderProgressListener {
@@ -130,7 +130,7 @@ public class CrawlerTask extends Task<Void> {
       }
       dataError.setPieValue(errorCount);
       datafinished.setPieValue(actualCount);
-      dataWorking.setPieValue((double) maxCount - actualCount);
+      dataWorking.setPieValue((double) maxCount - actualCount - errorCount);
 
     }
 
