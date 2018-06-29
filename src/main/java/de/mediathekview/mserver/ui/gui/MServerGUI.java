@@ -320,6 +320,8 @@ public class MServerGUI extends Application {
   private void initializeCrawleView() {
     crawlerSelectionView.setSourceItems(
         FXCollections.observableArrayList(crawlerManager.getAviableSenderToCrawl()));
+    crawlerSelectionView.getSourceItems().sort((final Sender sender1,
+        final Sender sender2) -> sender1.getName().compareTo(sender2.getName()));
     crawlerSelectionView
         .setSourceHeader(new Label(bundle.getString(BUNDLE_KEY_SELECTION_VIEW_SOURCE)));
     crawlerSelectionView
